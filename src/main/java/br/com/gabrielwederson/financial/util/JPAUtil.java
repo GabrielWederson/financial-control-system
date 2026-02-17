@@ -22,7 +22,7 @@ import java.util.Map;
                 props.put("jakarta.persistence.jdbc.user", dotenv.get("DB_USER"));
                 props.put("jakarta.persistence.jdbc.password", dotenv.get("DB_PASSWORD"));
 
-                emf = Persistence.createEntityManagerFactory("JPAhabito", props);
+                emf = Persistence.createEntityManagerFactory("JPAfinancial", props);
 
             } catch (Exception e) {
                 e.printStackTrace();
