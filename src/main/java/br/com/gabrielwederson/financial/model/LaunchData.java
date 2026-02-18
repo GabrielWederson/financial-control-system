@@ -4,7 +4,6 @@ package br.com.gabrielwederson.financial.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "LaunchData")
 public class LaunchData {
 
     @Id

@@ -2,13 +2,14 @@ package br.com.gabrielwederson.financial.util;
 
 import br.com.gabrielwederson.financial.model.LaunchData;
 import br.com.gabrielwederson.financial.model.Type;
-
 import java.io.*;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import java.io.*;
+import java.nio.file.*;
 
 public class ReportDAO {
-
-
-    private static final String path = System.getenv("FILE_PATH");
+static String path = "C:\\Users\\gabri\\OneDrive\\Documentos\\financial-control-system\\data";
 
     public static void savedata(LaunchData launchdata) {
 
@@ -41,62 +42,49 @@ public class ReportDAO {
         }
     }
 
-    public void generatesum(){
 
-        double totalRevenues = 0;
-        double totalExpenses = 0;
-        String linereader;
 
-        boolean temRevenue = false;
-        boolean temExpense = false;
+    public static void getsum(String path) {
+        double totalRevenues = 0.0;
+        double totalExpenses = 0.0;
 
-        try(BufferedReader revenueReader = new BufferedReader(new FileReader(path + "\\revenues.csv"))){
-            revenueReader.readLine();
-            while ((linereader = revenueReader.readLine()) != null) {
-                temRevenue = true;
+        totalRevenues = readCsvTotal(path + "\\revenues.csv");
+        totalExpenses = readCsvTotal(path + "\\expenses.csv");
 
-                int first = linereader.indexOf(",");
-                int second = linereader.indexOf(",", first + 1);
-                int third = linereader.indexOf(",", second + 1);
+        double result = totalRevenues - totalExpenses;
 
-                String valorString = linereader.substring(second + 1, third);
-                totalRevenues += Double.parseDouble(valorString);
-            }
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(path + "\\sum.csv"))) {
+            bw.write(String.format("%.2f", result));
         } catch (IOException e) {
-            System.out.println("ERROR: " + e.getMessage());
+            System.out.println("Erro in sum.csv: " + e.getMessage());
         }
 
-        try(BufferedReader expenseReader = new BufferedReader(new FileReader(path + "\\expenses.csv"))) {
-            expenseReader.readLine();
+        System.out.println("Revenues: " + totalRevenues + " | Expenses: " + totalExpenses + " | Resultado: " + result);
+    }
 
-            while ((linereader = expenseReader.readLine()) != null) {
-                temExpense = true;
+    private static double readCsvTotal(String filepath) {
+        double total = 0.0;
 
-                int first = linereader.indexOf(",");
-                int second = linereader.indexOf(",", first + 1);
-                int third = linereader.indexOf(",", second + 1);
+        File file = new File(filepath);
+        if (!file.exists()) return total;
 
-                String valorString = linereader.substring(second + 1, third);
-                totalExpenses += Double.parseDouble(valorString);
+        try (CSVReader reader = new CSVReader(new FileReader(filepath))) {
+            String[] line;
+            while ((line = reader.readNext()) != null) {
+                if (line.length >= 3) {
+                    try {
+                        // remove espaços e caracteres invisíveis
+                        double valor = Double.parseDouble(line[2].trim().replaceAll("[^0-9.\\-]", ""));
+                        total += valor;
+                    } catch (NumberFormatException e) {
+                        System.out.println("Error" + filepath + ": '" + line[2] + "'");
+                    }
+                }
             }
-        } catch(IOException e){
-            System.out.println("ERROR: " + e.getMessage());
+        } catch (IOException | CsvValidationException e) {
+            System.out.println("Error" + filepath + ": " + e.getMessage());
         }
 
-        try (BufferedWriter bw = new BufferedWriter(
-                new FileWriter(path + "\\sum.csv", true))) {
-
-            if (temRevenue && temExpense) {
-                double total = totalRevenues - totalExpenses;
-                String totalS = String.valueOf(total);
-
-                bw.write(totalS);
-                bw.newLine();
-            }
-
-        } catch (IOException e) {
-            System.out.println("ERROR: " + e.getMessage());
-        }
-
+        return total;
     }
 }
