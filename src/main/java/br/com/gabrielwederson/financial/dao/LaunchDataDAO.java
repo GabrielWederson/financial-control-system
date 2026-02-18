@@ -65,7 +65,7 @@ public class LaunchDataDAO {
             launchData = em.find(LaunchData.class, id);
 
             if (launchData == null) {
-                throw new IllegalArgumentException("LaunchData com ID " + id + " não encontrado.");
+                throw new IllegalArgumentException("LaunchData ID " + id + " not found.");
             }
 
             // Atualiza os campos
@@ -78,7 +78,7 @@ public class LaunchDataDAO {
             if (em.getTransaction().isActive()) {
                 em.getTransaction().rollback();
             }
-            System.err.println("Erro ao atualizar LaunchData: " + e.getMessage());
+            System.err.println("Erro for update in LaunchData: " + e.getMessage());
         } finally {
             em.close();
         }
