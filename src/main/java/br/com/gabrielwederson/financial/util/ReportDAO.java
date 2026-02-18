@@ -59,7 +59,7 @@ static String path = "C:\\Users\\gabri\\OneDrive\\Documentos\\financial-control-
             System.out.println("Erro in sum.csv: " + e.getMessage());
         }
 
-        System.out.println("Revenues: " + totalRevenues + " | Expenses: " + totalExpenses + " | Resultado: " + result);
+        System.out.println("Revenues: " + totalRevenues + " | Expenses: " + totalExpenses + " | Result: " + result);
     }
 
     private static double readCsvTotal(String filepath) {
